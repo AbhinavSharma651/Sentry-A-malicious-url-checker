@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sentry — URL Threat Check</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="scanlines" aria-hidden="true"></div>
+
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <div class="brand">
+      <span class="brand-mark"></span>
+      <span class="brand-name">Sentry</span>
+    </div>
+    <div class="model-badge">
+      <span class="dot"></span>
+      Model live &middot; {{ (metrics.accuracy * 100) | round(1) }}% test accuracy
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="hero wrap">
+    <h1>Paste a link. Know in a blink.</h1>
+    <p class="sub">Sentry reads the structure of a URL — no clicking through, no waiting on a blocklist — and tells you whether it looks like a phishing page, malware drop, defaced site, or the real thing.</p>
+
+    <form id="check-form" autocomplete="off">
+      <div class="input-row">
+        <input
+          type="text"
+          id="url-input"
+          name="url"
+          placeholder="e.g. http://secure-paypal-login.verify-account.tk/reset"
+          spellcheck="false"
+        >
+        <button type="submit" id="check-btn">
+          <span class="btn-label">Check URL</span>
+        </button>
+      </div>
+      <p class="hint" id="form-hint">Works entirely on the URL text itself — nothing is fetched or visited.</p>
+    </form>
+
+    <div id="scan-indicator" class="scan-indicator hidden">
+      <div class="scan-ring"></div>
+      <span>Reading URL structure&hellip;</span>
+    </div>
+
+    <div id="result" class="result hidden"></div>
+  </section>
+
+  <section class="how wrap">
+    <h2>What Sentry looks at</h2>
+    <div class="how-grid">
+      <div class="how-card">
+        <span class="how-index">Structure</span>
+        <p>Length, depth, and shape of the path and hostname — attackers favor long, nested, oddly-punctuated links.</p>
+      </div>
+      <div class="how-card">
+        <span class="how-index">Composition</span>
+        <p>Ratio of digits to letters, hyphen and underscore counts, raw IP addresses standing in for a domain name.</p>
+      </div>
+      <div class="how-card">
+        <span class="how-index">Vocabulary</span>
+        <p>Bait words like <em>verify</em>, <em>secure</em>, or <em>account</em> stitched into an unrelated domain.</p>
+      </div>
+      <div class="how-card">
+        <span class="how-index">Randomness</span>
+        <p>Character entropy — auto-generated malicious links read as noisier than a URL a person typed by hand.</p>
+      </div>
+    </div>
+    <p class="model-note">
+      Trained on 651,191 labeled URLs (benign, phishing, malware, defacement) with a random forest classifier.
+      Held-out macro F1: <strong>{{ (metrics.macro_f1 * 100) | round(1) }}%</strong>.
+      This is a lexical classifier, not a live reputation service — treat results as a strong signal, not a verdict.
+    </p>
+  </section>
+</main>
+
+<footer class="wrap">
+  <span>Sentry URL Classifier</span>
+  <span class="foot-sep">Lexical analysis only — no browsing, no lookups</span>
+</footer>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
